@@ -1,0 +1,48 @@
+{
+  "applications": "*",
+  "changelogDate": "20240630190041",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "customer",
+  "fields": [
+    {
+      "fieldName": "firstName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "lastName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "email",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "phone",
+      "fieldType": "String"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Customer",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "order",
+      "otherEntityRelationshipName": "customer",
+      "relationshipName": "orders",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "product",
+      "otherEntityRelationshipName": "customer",
+      "relationshipName": "products",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "no"
+}

@@ -1,0 +1,40 @@
+enum OrderStatus {
+    PENDING, COMPLETED, CANCELLED
+}
+
+entity Product {
+  name String required,
+  description String,
+  price BigDecimal required,
+  stock Integer required,
+  dateAdded LocalDate,
+  lastUpdated LocalDate
+}
+
+entity Customer {
+  firstName String required,
+  lastName String required,
+  email String required unique,
+  phone String
+}
+
+entity Order {
+  orderDate Instant required,
+  status OrderStatus required,
+  totalAmount BigDecimal required
+}
+
+entity OrderItem {
+  quantity Integer required,
+  unitPrice BigDecimal required
+}
+
+relationship OneToMany {
+  Customer{orders} to Order{customer},
+  Order{items} to OrderItem{order},
+  Customer{products} to Product{customer}
+}
+
+relationship ManyToOne {
+  OrderItem{product(name)} to Product
+}
