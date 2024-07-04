@@ -7,9 +7,16 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout SCM') {
             steps {
-                git 'https://github.com/agustinprieto50/final-isa'
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/agustinprieto50/final-isa',
+                        credentialsId: '21a6c28d-f9d2-4981-8458-99545e2e715f'
+                    ]]
+                ])
             }
         }
         stage('Build Docker Image') {
