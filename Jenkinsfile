@@ -7,15 +7,17 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout SCM') {
             steps {
-                git 'https://github.com/agustinprieto50/final-isa'
+                script {
+                    checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/agustinprieto50/final-isa', credentialsId: '21a6c28d-f9d2-4981-8458-99545e2e715f']]])
+                }
             }
         }
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKERHUB_REPO}")
+                    def customImage = docker.build("$DOCKERHUB_REPO")
                 }
             }
         }
@@ -23,7 +25,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
-                        docker.image("${DOCKERHUB_REPO}").push('latest')
+                        customImage.push('latest')
                     }
                 }
             }
