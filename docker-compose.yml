@@ -1,0 +1,116 @@
+version: '3.7'
+services:
+  mystore:
+    image: mystore:latest
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod,api-docs
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://mystore-postgresql:5432/mystore
+      - SPRING_DATASOURCE_USERNAME=mystore
+      - SPRING_DATASOURCE_PASSWORD=yourpassword
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://mystore-postgresql:5432/mystore
+      - SPRING_LIQUIBASE_USERNAME=mystore
+      - SPRING_LIQUIBASE_PASSWORD=yourpassword
+      - JHIPSTER_SLEEP=30
+      - LOGSTASH_HOST=logstash
+      - LOGSTASH_PORT=5044
+    ports:
+      - '8080:8080'
+    depends_on:
+      - mystore-postgresql
+      - logstash
+    volumes:
+      - mystore-logs:/var/log/mystore
+    logging:
+      driver: json-file
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:8080/actuator/health || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  mystore-postgresql:
+    image: postgres:14.5
+    environment:
+      - POSTGRES_USER=mystore
+      - POSTGRES_PASSWORD=yourpassword
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U mystore']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:9200/_cluster/health || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.12.0
+    container_name: logstash
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - mystore-logs:/var/log/mystore
+    ports:
+      - '5044:5044'
+      - '12201:12201/udp'
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:9600/_node/health || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      - xpack.monitoring.enabled=false
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=changeme # Change this to your actual password
+      - ELASTIC_HOSTS=http://elasticsearch:9200
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.12.0
+    container_name: kibana
+    ports:
+      - '5601:5601'
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    platform: linux/amd64
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:5601/api/status || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  esdata:
+    driver: local
+  certs:
+    driver: local
+  logstashdata01:
+    driver: local
+  mystore-logs:
+    driver: local

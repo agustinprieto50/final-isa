@@ -2,6 +2,7 @@ package com.mycompany.myapp;
 
 import com.mycompany.myapp.config.ApplicationProperties;
 import com.mycompany.myapp.config.CRLFLogConverter;
+import com.mycompany.myapp.config.JHipsterProperties;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -20,7 +21,7 @@ import tech.jhipster.config.DefaultProfileUtil;
 import tech.jhipster.config.JHipsterConstants;
 
 @SpringBootApplication
-@EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class })
+@EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class, JHipsterProperties.class })
 public class MystoreApp {
 
     private static final Logger log = LoggerFactory.getLogger(MystoreApp.class);

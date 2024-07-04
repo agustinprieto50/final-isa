@@ -15,10 +15,17 @@
 
 logging:
   level:
-    ROOT: DEBUG
-    tech.jhipster: DEBUG
-    org.hibernate.SQL: DEBUG
-    com.mycompany.myapp: DEBUG
+    ROOT: INFO
+  file:
+    path: /var/log/mystore/
+    name: mystore.log
+  pattern:
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n'
+  logstash:
+    enabled: true
+    host: logstash
+    port: 5044
+    queue-size: 512
 
 spring:
   devtools:
@@ -73,15 +80,15 @@ jhipster:
   # CORS is only enabled by default with the "dev" profile
   cors:
     # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
-    allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000,http://localhost:4200,https://localhost:4200'
+    allowed-origins: 'http://localhost:810, http://localhost:4200'
     # Enable CORS when running in GitHub Codespaces
-    allowed-origin-patterns: 'https://*.githubpreview.dev'
     allowed-methods: '*'
     allowed-headers: '*'
     exposed-headers: 'Authorization,Link,X-Total-Count,X-${jhipster.clientApp.name}-alert,X-${jhipster.clientApp.name}-error,X-${jhipster.clientApp.name}-params'
     allow-credentials: true
     max-age: 1800
   security:
+    # api-key: "aP1cRf4M9kzT3hVrYbX8vTzL1jNpQhW4"
     authentication:
       jwt:
         # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)
@@ -93,11 +100,6 @@ jhipster:
     base-url: http://127.0.0.1:8080
   logging:
     use-json-format: false # By default, logs are not in Json format
-    logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
-      enabled: false
-      host: localhost
-      port: 5000
-      queue-size: 512
 # ===================================================================
 # Application specific properties
 # Add your own application properties here, see the ApplicationProperties class

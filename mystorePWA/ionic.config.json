@@ -1,0 +1,7 @@
+{
+  "name": "mystorePWA",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
